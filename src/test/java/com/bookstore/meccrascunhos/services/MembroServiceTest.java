@@ -1,32 +1,24 @@
 package com.bookstore.meccrascunhos.services;
 
+import com.bookstore.meccrascunhos.exceptions.RequiredObjectIsNullException;
 import com.bookstore.meccrascunhos.models.Membro;
 import com.bookstore.meccrascunhos.models.dtos.MembroDTO;
 import com.bookstore.meccrascunhos.models.enums.Cargo;
 import com.bookstore.meccrascunhos.models.enums.Status;
 import com.bookstore.meccrascunhos.repositories.MembroRepository;
 import com.bookstore.meccrascunhos.unitetests.mappers.mocks.MockMembro;
-import com.jayway.jsonpath.spi.cache.Cache;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@ExtendWith(MockitoExtension.class)
-@SpringBootTest
 class MembroServiceTest {
 
     MockMembro input;
@@ -45,6 +37,23 @@ class MembroServiceTest {
 
     @Test
     void findAll() {
+        List<Membro> list = input.mockEntityList();
+        when(repository.findAll()).thenReturn(list);
+
+        List<MembroDTO> membros = service.findAll();
+
+        MembroDTO membroDois = membros.get(2);
+        asserts(2, membroDois);
+
+        MembroDTO membroSete = membros.get(7);
+        asserts(7, membroSete);
+
+        MembroDTO membroOnze = membros.get(11);
+        asserts(11, membroOnze);
+
+        MembroDTO membroCatorze = membros.get(14);
+        asserts(14, membroCatorze);
+
     }
 
     @Test
@@ -59,39 +68,7 @@ class MembroServiceTest {
 
         var result = service.findById(entityId);
 
-        assertNotNull(result);
-        assertNotNull(result.getId());
-
-        assertEquals("Entidade 7", result.getNome());
-        assertEquals("777.777.777-77", result.getCPF());
-        assertEquals(LocalDate.of(2001, 01, 01), result.getDataNascimento());
-        assertEquals("(77) 7777-7777", result.getTelefone());
-        assertEquals(Cargo.LIDER, result.getCargoName());
-        assertEquals(Status.ATIVO, result.getStatusName());
-
-        assertNotNull(result.getLinks());
-        assertNotNull(result.getLinks().stream()
-                .anyMatch(l -> l.getRel().value().equals("self")
-                && l.getType().equals("GET")
-                && l.getHref().endsWith("membros/" + entityId)));
-        assertNotNull(result.getLinks().stream()
-                .anyMatch(l -> l.getRel().value().equals("findAll")
-                        && l.getType().equals("GET")
-                        && l.getHref().endsWith("membros")));
-        assertNotNull(result.getLinks().stream()
-                .anyMatch(l -> l.getRel().value().equals("insert")
-                        && l.getType().equals("POST")
-                        && l.getHref().endsWith("membros")));
-        assertNotNull(result.getLinks().stream()
-                .anyMatch(l -> l.getRel().value().equals("update")
-                        && l.getType().equals("PUT")
-                        && l.getHref().endsWith("membros/" + entityId)));
-        assertNotNull(result.getLinks().stream()
-                .anyMatch(l -> l.getRel().value().equals("delete")
-                        && l.getType().equals("DELETE")
-                        && l.getHref().endsWith("membros/" + entityId)));
-
-
+        asserts(7, result);
 
     }
 
@@ -109,41 +86,23 @@ class MembroServiceTest {
         when(repository.save(any(Membro.class))).thenReturn(persisted);
         MembroDTO result = service.insert(dto);
 
-        assertNotNull(result);
-        assertNotNull(result.getId());
-
-        assertEquals("Entidade 4", result.getNome());
-        assertEquals("444.444.444-44", result.getCPF());
-        assertEquals("(44) 4444-4444", result.getTelefone());
-        assertEquals(Cargo.PASTOR, result.getCargoName());
-        assertEquals(Status.ATIVO, result.getStatusName());
-
-        assertEquals(LocalDate.of(2001, 01, 01), result.getDataNascimento());
-
-
-        assertNotNull(result.getLinks());
-        assertNotNull(result.getLinks().stream()
-                .anyMatch(l -> l.getRel().value().equals("self")
-                        && l.getType().equals("GET")
-                        && l.getHref().endsWith("membros/" + id)));
-        assertNotNull(result.getLinks().stream()
-                .anyMatch(l -> l.getRel().value().equals("findAll")
-                        && l.getType().equals("GET")
-                        && l.getHref().endsWith("membros")));
-        assertNotNull(result.getLinks().stream()
-                .anyMatch(l -> l.getRel().value().equals("insert")
-                        && l.getType().equals("POST")
-                        && l.getHref().endsWith("membros")));
-        assertNotNull(result.getLinks().stream()
-                .anyMatch(l -> l.getRel().value().equals("update")
-                        && l.getType().equals("PUT")
-                        && l.getHref().endsWith("membros/" + id)));
-        assertNotNull(result.getLinks().stream()
-                .anyMatch(l -> l.getRel().value().equals("delete")
-                        && l.getType().equals("DELETE")
-                        && l.getHref().endsWith("membros/" + id)));
+        asserts(4, result);
 
     }
+
+    @Test
+    void testInsertWithNullMembro() {
+        Exception err = assertThrows(RequiredObjectIsNullException.class,
+                () -> service.insert(null));
+
+
+        String expectedMessage = "Não é permitida a persistência de objetos nulos.";
+        String actualMessage = err.getMessage();
+
+        assertTrue(actualMessage.contains(expectedMessage));
+
+    }
+
 
     @Test
     void update() {
@@ -160,36 +119,19 @@ class MembroServiceTest {
 
         MembroDTO result = service.update(id, dto);
 
-        assertNotNull(result);
-        assertNotNull(result.getId());
+        asserts(9, result);
 
-        assertEquals("Entidade 9", result.getNome());
-        assertEquals("999.999.999-99", result.getCPF());
-        assertEquals("(99) 9999-9999", result.getTelefone());
-        assertEquals(Cargo.LIDER, result.getCargoName());
+    }
 
-        assertNotNull(result.getLinks());
-        assertNotNull(result.getLinks().stream()
-                .anyMatch(l -> l.getRel().value().equals("self")
-                        && l.getType().equals("GET")
-                        && l.getHref().endsWith("membros/" + id)));
-        assertNotNull(result.getLinks().stream()
-                .anyMatch(l -> l.getRel().value().equals("findAll")
-                        && l.getType().equals("GET")
-                        && l.getHref().endsWith("membros")));
-        assertNotNull(result.getLinks().stream()
-                .anyMatch(l -> l.getRel().value().equals("insert")
-                        && l.getType().equals("POST")
-                        && l.getHref().endsWith("membros")));
-        assertNotNull(result.getLinks().stream()
-                .anyMatch(l -> l.getRel().value().equals("update")
-                        && l.getType().equals("PUT")
-                        && l.getHref().endsWith("membros/" + id)));
-        assertNotNull(result.getLinks().stream()
-                .anyMatch(l -> l.getRel().value().equals("delete")
-                        && l.getType().equals("DELETE")
-                        && l.getHref().endsWith("membros/" + id)));
+    @Test
+    void testUpdateWithNullPerson() {
+        Exception err = assertThrows(RequiredObjectIsNullException.class,
+                () -> service.update(null, null));
 
+        String expectedMessage = "Não é permitida a persistência de objetos nulos.";
+        String actualMessage = err.getMessage();
+
+        assertTrue(actualMessage.contains(expectedMessage));
     }
 
     @Test
@@ -204,6 +146,49 @@ class MembroServiceTest {
         verify(repository, times(1)).findById(any(UUID.class));
         verify(repository, times(1)).delete(any(Membro.class));
         verifyNoMoreInteractions(repository);
+    }
+
+    void asserts(int number, MembroDTO dto) {
+        assertNotNull(dto);
+        assertNotNull(dto.getId());
+
+        assertEquals("Entidade " + number, dto.getNome());
+        assertEquals(MockMembro.criaCPF(number), dto.getCPF());
+        assertEquals(LocalDate.of(2001, 01, 01), dto.getDataNascimento());
+        assertEquals(MockMembro.criaTelefone(number), dto.getTelefone());
+
+        if (number % 2 == 0) {
+            assertEquals(Cargo.PASTOR, dto.getCargoName());
+            assertEquals(Status.ATIVO, dto.getStatusName());
+        }
+        else {
+            assertEquals(Cargo.LIDER, dto.getCargoName());
+            assertEquals(Status.INATIVO, dto.getStatusName());
+        }
+
+
+        assertNotNull(dto.getLinks());
+        assertNotNull(dto.getLinks().stream()
+                .anyMatch(l -> l.getRel().value().equals("self")
+                        && l.getType().equals("GET")
+                        && l.getHref().endsWith("membros/" + dto.getId())));
+        assertNotNull(dto.getLinks().stream()
+                .anyMatch(l -> l.getRel().value().equals("findAll")
+                        && l.getType().equals("GET")
+                        && l.getHref().endsWith("membros")));
+        assertNotNull(dto.getLinks().stream()
+                .anyMatch(l -> l.getRel().value().equals("insert")
+                        && l.getType().equals("POST")
+                        && l.getHref().endsWith("membros")));
+        assertNotNull(dto.getLinks().stream()
+                .anyMatch(l -> l.getRel().value().equals("update")
+                        && l.getType().equals("PUT")
+                        && l.getHref().endsWith("membros/" + dto.getId())));
+        assertNotNull(dto.getLinks().stream()
+                .anyMatch(l -> l.getRel().value().equals("delete")
+                        && l.getType().equals("DELETE")
+                        && l.getHref().endsWith("membros/" + dto.getId())));
+
     }
 
 }

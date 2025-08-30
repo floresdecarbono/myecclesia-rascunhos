@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class MockMembro {
 
@@ -21,6 +22,7 @@ public class MockMembro {
 
     public MembroDTO mockDTO(Integer number) {
         MembroDTO m = new MembroDTO();
+        m.setId(UUID.randomUUID());
         m.setNome("Entidade " + number);
         m.setCPF(criaCPF(number));
         m.setTelefone(criaTelefone(number));
@@ -52,6 +54,7 @@ public class MockMembro {
 
     public Membro mockEntity(Integer number) {
         Membro m = new Membro();
+        m.setId(UUID.randomUUID());
         m.setNome("Entidade " + number);
         m.setCPF(criaCPF(number));
         m.setTelefone(criaTelefone(number));
@@ -74,14 +77,14 @@ public class MockMembro {
     public List<Membro> mockEntityList() {
         List<Membro> list = new ArrayList<Membro>();
 
-        for (int i = 1; i <= 15; i++) {
+        for (int i = 0; i < 15; i++) {
             list.add(mockEntity(i));
         }
 
         return list;
     }
 
-    private String criaCPF(Integer number) {
+    public static String criaCPF(Integer number) {
         String n = String.valueOf(number);
 
         StringBuilder cpf = new StringBuilder();
@@ -97,7 +100,7 @@ public class MockMembro {
         return cpf.toString();
     }
 
-    private String criaTelefone(Integer number) {
+    public static String criaTelefone(Integer number) {
         String n = String.valueOf(number);
 
         StringBuilder telefone = new StringBuilder();

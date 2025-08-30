@@ -74,7 +74,7 @@ public class MembroService {
 
     public MembroDTO update(UUID id, MembroDTO novosDados) {
 
-        if (novosDados == null) throw new RequiredObjectIsNullException();
+        if (id == null || novosDados == null) throw new RequiredObjectIsNullException();
 
         logger.info("BUSCANDO MEMBRO DE ID " + id + ".");
         Membro entity = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Membro de ID " + id + " não encontrado."));

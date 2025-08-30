@@ -5,6 +5,7 @@ import com.bookstore.meccrascunhos.models.dtos.MembroDTO;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
+@Mapper(componentModel = "spring")
 public interface MembroMapper {
 
     MembroMapper INSTANCE = Mappers.getMapper(MembroMapper.class);
