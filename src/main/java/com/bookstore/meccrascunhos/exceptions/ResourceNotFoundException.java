@@ -10,6 +10,8 @@ public class ResourceNotFoundException extends RuntimeException implements Seria
 
     private static final long serialVersionUID = 1L;
 
+    public ResourceNotFoundException() {}
+
     public ResourceNotFoundException(String message) {
         super(message);
     }

@@ -15,13 +15,13 @@ public interface MembroMapper {
             @Mapping(source = "statusName", target = "statusCode"),
             @Mapping(source = "dataNascimento", target = "dataNascimento")
     })
-    Membro membroDTOtoMembro(MembroDTO dto);
+    Membro toEntity(MembroDTO dto);
 
     @Mappings({
             @Mapping(source = "cargoCode", target = "cargoName"),
             @Mapping(source = "statusCode", target = "statusName"),
             @Mapping(source = "dataNascimento", target = "dataNascimento")
     })
-    MembroDTO membroToMembroDTO(Membro entity);
+    MembroDTO toDTO(Membro entity);
 
 }

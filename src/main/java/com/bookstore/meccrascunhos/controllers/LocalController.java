@@ -1,6 +1,7 @@
 package com.bookstore.meccrascunhos.controllers;
 
 import com.bookstore.meccrascunhos.models.Local;
+import com.bookstore.meccrascunhos.models.dtos.LocalDTO;
 import com.bookstore.meccrascunhos.services.LocalService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,23 +21,23 @@ public class LocalController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Local>> findAll() {
+    public ResponseEntity<List<LocalDTO>> findAll() {
         return ResponseEntity.status(HttpStatus.OK).body(service.findAll());
     }
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<Local> findById(@PathVariable UUID id) {
+    public ResponseEntity<LocalDTO> findById(@PathVariable UUID id) {
         return ResponseEntity.status(HttpStatus.OK).body(service.findById(id));
     }
 
     @PostMapping
-    public ResponseEntity<Local> insert(@RequestBody Local local) {
-        return ResponseEntity.status(HttpStatus.OK).body(service.insert(local));
+    public ResponseEntity<LocalDTO> insert(@RequestBody LocalDTO requestDTO) {
+        return ResponseEntity.status(HttpStatus.OK).body(service.insert(requestDTO));
     }
 
     @PutMapping(value = "/{id}")
-    public ResponseEntity<Local> update(@PathVariable UUID id, @RequestBody Local local) {
-        return ResponseEntity.status(HttpStatus.OK).body(service.update(id, local));
+    public ResponseEntity<LocalDTO> update(@PathVariable UUID id, @RequestBody LocalDTO requestDTO) {
+        return ResponseEntity.status(HttpStatus.OK).body(service.update(id, requestDTO));
     }
 
     @DeleteMapping(value = "/{id}")

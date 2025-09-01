@@ -1,12 +1,12 @@
 package com.bookstore.meccrascunhos.models;
 
 import com.bookstore.meccrascunhos.models.enums.Estado;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 @Table(name = "TB_LOCAIS")
@@ -37,17 +37,31 @@ public class Local implements Serializable {
     @Column(nullable = false)
     private Integer estado;
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "local", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<Evento> eventos = new LinkedHashSet<>();
+
     public Local() {}
 
-    public Local(UUID id, String descricao, String numero, String logradouro, String bairro, String cidade, Estado estado) {
+    public Local(UUID id, String descricao, String numero, String logradouro, String bairro, String cidade, Integer estado) {
         this.id = id;
         this.descricao = descricao;
         this.numero = numero;
         this.logradouro = logradouro;
         this.bairro = bairro;
         this.cidade = cidade;
+        this.estado = estado;
+    }
 
-        setEstado(estado);
+    public Local(UUID id, String descricao, String numero, String logradouro, String bairro, String cidade, Integer estado, Set<Evento> eventos) {
+        this.id = id;
+        this.descricao = descricao;
+        this.numero = numero;
+        this.logradouro = logradouro;
+        this.bairro = bairro;
+        this.cidade = cidade;
+        this.estado = estado;
+        this.eventos = eventos;
     }
 
     public UUID getId() {
@@ -104,6 +118,14 @@ public class Local implements Serializable {
 
     public void setEstado(Estado estado) {
         this.estado = estado.getCode();
+    }
+
+    public Set<Evento> getEventos() {
+        return eventos;
+    }
+
+    public void setEventos(Set<Evento> eventos) {
+        this.eventos = eventos;
     }
 
     @Override

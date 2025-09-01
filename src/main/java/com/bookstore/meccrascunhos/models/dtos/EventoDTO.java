@@ -1,47 +1,34 @@
-package com.bookstore.meccrascunhos.models;
+package com.bookstore.meccrascunhos.models.dtos;
 
+import com.bookstore.meccrascunhos.models.Local;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.persistence.*;
 
-import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Objects;
 import java.util.UUID;
 
-@Entity
-@Table(name = "TB_EVENTOS")
-public class Evento implements Serializable {
+public class EventoDTO implements Serializable {
 
-    @Serial
     private static final long serialVersionUID = 1L;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-
-    @Column(nullable = false)
     private String descricao;
+    private UUID localId;
 
-    @ManyToOne
-    @JoinColumn(name = "local_id", nullable = false)
-    private Local local;
-
-    @Column(nullable = false)
     @JsonFormat(pattern = "dd/MM/yyyy")
     private LocalDate data;
 
-    @Column(nullable = false)
     @JsonFormat(pattern = "HH:mm")
     private LocalTime horario;
 
-    public Evento() {}
+    public EventoDTO() {}
 
-    public Evento(UUID id, String descricao, Local local, LocalDate data, LocalTime horario) {
+    public EventoDTO(UUID id, String descricao, UUID localId, LocalDate data, LocalTime horario) {
         this.id = id;
         this.descricao = descricao;
-        this.local = local;
+        this.localId = localId;
         this.data = data;
         this.horario = horario;
     }
@@ -62,12 +49,12 @@ public class Evento implements Serializable {
         this.descricao = descricao;
     }
 
-    public Local getLocal() {
-        return local;
+    public UUID getLocalId() {
+        return localId;
     }
 
-    public void setLocal(Local local) {
-        this.local = local;
+    public void setLocalId(UUID localId) {
+        this.localId = localId;
     }
 
     public LocalDate getData() {
@@ -89,8 +76,8 @@ public class Evento implements Serializable {
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
-        Evento evento = (Evento) o;
-        return Objects.equals(id, evento.id);
+        EventoDTO eventoDTO = (EventoDTO) o;
+        return Objects.equals(id, eventoDTO.id);
     }
 
     @Override
@@ -100,10 +87,10 @@ public class Evento implements Serializable {
 
     @Override
     public String toString() {
-        return "Evento[" +
-                "id='" + id + '\'' +
-                "descricao='" + descricao + '\'' +
-                ", local='" + local + '\'' +
+        return "EventoDTO[" +
+                "id=" + id +
+                ", descricao='" + descricao + '\'' +
+                ", localId=" + localId +
                 ", data=" + data +
                 ", horario=" + horario +
                 ']';

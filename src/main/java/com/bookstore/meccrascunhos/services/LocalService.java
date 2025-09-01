@@ -1,8 +1,14 @@
 package com.bookstore.meccrascunhos.services;
 
+import com.bookstore.meccrascunhos.exceptions.RequiredObjectIsNullException;
 import com.bookstore.meccrascunhos.exceptions.ResourceNotFoundException;
 import com.bookstore.meccrascunhos.models.Local;
+import com.bookstore.meccrascunhos.models.dtos.LocalDTO;
+import com.bookstore.meccrascunhos.models.enums.Estado;
+import com.bookstore.meccrascunhos.models.mappers.LocalMapper;
 import com.bookstore.meccrascunhos.repositories.LocalRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,47 +17,69 @@ import java.util.UUID;
 @Service
 public class LocalService {
 
+    private Logger logger = LoggerFactory.getLogger(LocalService.class.getName());
     private final LocalRepository repository;
 
     public LocalService(LocalRepository repository) {
         this.repository = repository;
     }
 
-    public List<Local> findAll() {
-        return repository.findAll();
+    public List<LocalDTO> findAll() {
+        return repository.findAll().stream()
+                .map(LocalMapper.INSTANCE::toDTO)
+                .toList();
     }
 
-    public Local findById(UUID id) {
-        return repository.findById(id)
+    public LocalDTO findById(UUID id) {
+        Local entity =  repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Local de ID " + id + " não encontrado."));
+
+        return LocalMapper.INSTANCE.toDTO(repository.save(entity));
     }
 
-    public Local insert(Local local) {
-        return repository.save(local);
+    public LocalDTO insert(LocalDTO requestDTO) {
+
+        if (requestDTO == null) throw new RequiredObjectIsNullException();
+
+        logger.info("CONVERTENDO O DTO LOCAL EM ENTIDADE");
+        Local entity = LocalMapper.INSTANCE.toEntity(requestDTO);
+
+        logger.info("SALVANDO ENTIDADE LOCAL NO REPOSITORY");
+        logger.info("CONVERTENDO A ENTIDADE LOCAL EM DTO");
+
+        LocalDTO responseDTO = LocalMapper.INSTANCE.toDTO(repository.save(entity));
+        return responseDTO;
     }
 
-    public Local update(UUID id, Local novosDados) {
-        Local local = repository.findById(id)
+    public LocalDTO update(UUID id, LocalDTO requestDTO) {
+
+        if (id == null || requestDTO == null) throw new RequiredObjectIsNullException();
+
+        logger.info("BUSCANDO LOCAL DE ID" + id + ".");
+
+        Local entity = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Local de ID " + id + " não encontrado."));
-        updateData(local, novosDados);
+        updateData(entity, requestDTO);
 
-        return repository.save(local);
+        LocalDTO responseDTO = LocalMapper.INSTANCE.toDTO(repository.save(entity));
+
+        return responseDTO;
     }
 
     public void delete(UUID id) {
-        Local local = repository.findById(id)
+        Local entity = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Local de ID " + id +  "não encontrado."));
 
-        repository.delete(local);
+        repository.delete(entity);
     }
 
-    private void updateData(Local local, Local novosDados) {
-        local.setDescricao(novosDados.getDescricao());
-        local.setLogradouro(novosDados.getLogradouro());
-        local.setNumero(novosDados.getNumero());
-        local.setBairro(novosDados.getBairro());
-        local.setCidade(novosDados.getCidade());
-        local.setEstado(novosDados.getEstado());
+    private void updateData(Local oldData, LocalDTO newData) {
+        oldData.setDescricao(newData.getDescricao());
+        oldData.setLogradouro(newData.getLogradouro());
+        oldData.setNumero(newData.getNumero());
+        oldData.setBairro(newData.getBairro());
+        oldData.setCidade(newData.getCidade());
+        oldData.setEstado(Estado.valueOf(newData.getEstado()));
     }
 
 

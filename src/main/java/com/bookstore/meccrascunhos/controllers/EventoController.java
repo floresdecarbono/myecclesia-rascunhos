@@ -1,6 +1,7 @@
 package com.bookstore.meccrascunhos.controllers;
 
 import com.bookstore.meccrascunhos.models.Evento;
+import com.bookstore.meccrascunhos.models.dtos.EventoDTO;
 import com.bookstore.meccrascunhos.services.EventoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,23 +21,23 @@ public class EventoController {
     }
 
     @GetMapping()
-    ResponseEntity<List<Evento>> findAll() {
+    ResponseEntity<List<EventoDTO>> findAll() {
         return ResponseEntity.status(HttpStatus.OK).body(service.findAll());
     }
 
     @GetMapping(value = "/{id}")
-    ResponseEntity<Evento> findById(@PathVariable UUID id) {
+    ResponseEntity<EventoDTO> findById(@PathVariable UUID id) {
         return ResponseEntity.status(HttpStatus.OK).body(service.findById(id));
     }
 
     @PostMapping
-    ResponseEntity<Evento> insert(@RequestBody Evento evento) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(service.insert(evento));
+    ResponseEntity<EventoDTO> insert(@RequestBody EventoDTO requestDTO) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.insert(requestDTO));
     }
 
     @PutMapping(value = "/{id}")
-    ResponseEntity<Evento> update(@PathVariable UUID id, @RequestBody Evento evento) {
-        return ResponseEntity.status(HttpStatus.OK).body(service.update(id, evento));
+    ResponseEntity<EventoDTO> update(@PathVariable UUID id, @RequestBody EventoDTO requestDTO) {
+        return ResponseEntity.status(HttpStatus.OK).body(service.update(id, requestDTO));
     }
 
     @DeleteMapping(value = "/{id}")

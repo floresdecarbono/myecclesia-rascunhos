@@ -31,7 +31,7 @@ public class MembroService {
         logger.info("BUSCANDO TODOS OS MEMBROS.");
 
         List<MembroDTO> list = repository.findAll().stream()
-                .map(MembroMapper.INSTANCE::membroToMembroDTO).toList();
+                .map(MembroMapper.INSTANCE::toDTO).toList();
         list.forEach(MembroService::addLinks);
 
         return list;
@@ -42,7 +42,7 @@ public class MembroService {
 
         List<MembroDTO> list = repository.findAll().stream()
                 .filter(m -> m.getStatusCode() == Status.ATIVO)
-                .map(MembroMapper.INSTANCE::membroToMembroDTO).toList();
+                .map(MembroMapper.INSTANCE::toDTO).toList();
         list.forEach(MembroService::addLinks);
 
         return list;
@@ -53,23 +53,23 @@ public class MembroService {
         Membro entity = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Membro de ID " + id + " não encontrado."));
 
-        MembroDTO dto = MembroMapper.INSTANCE.membroToMembroDTO(entity);
-        addLinks(dto);
+        MembroDTO responseDTO = MembroMapper.INSTANCE.toDTO(entity);
+        addLinks(responseDTO);
 
-        return dto;
+        return responseDTO;
     }
 
     public MembroDTO insert(MembroDTO membroDTO) {
 
         if (membroDTO == null) throw new RequiredObjectIsNullException();
 
-        Membro entity = MembroMapper.INSTANCE.membroDTOtoMembro(membroDTO);
+        Membro entity = MembroMapper.INSTANCE.toEntity(membroDTO);
         logger.info("SALVANDO MEMBRO NO REPOSITORY.");
 
-        MembroDTO dto = MembroMapper.INSTANCE.membroToMembroDTO(repository.save(entity));
-        addLinks(dto);
+        MembroDTO responseDTO = MembroMapper.INSTANCE.toDTO(repository.save(entity));
+        addLinks(responseDTO);
 
-        return dto;
+        return responseDTO;
     }
 
     public MembroDTO update(UUID id, MembroDTO novosDados) {
@@ -83,10 +83,10 @@ public class MembroService {
         updateData(entity, novosDados);
 
         logger.info("SALVANDO AS NOVAS PROPRIEDADES DO MEMBRO.");
-        MembroDTO dto = MembroMapper.INSTANCE.membroToMembroDTO(repository.save(entity));
-        addLinks(dto);
+        MembroDTO responseDTO = MembroMapper.INSTANCE.toDTO(repository.save(entity));
+        addLinks(responseDTO);
 
-        return dto;
+        return responseDTO;
     }
 
     public void delete(UUID id) {
